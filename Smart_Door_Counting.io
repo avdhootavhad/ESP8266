@@ -4,8 +4,8 @@
 #include <ESP8266mDNS.h>
 
 #ifndef STASSID
-#define STASSID "Vicky"
-#define STAPSK  "vikas123"
+#define STASSID "Domenor"
+#define STAPSK  "Domenor123"
 #endif
 
 const char *ssid = STASSID;
@@ -14,7 +14,10 @@ float count;
 ESP8266WebServer server(80);
 
 const int led = 13;
-int IR=7;
+int IR1=D1;
+int IR2=D2;
+int inside;
+int outgoing;
 
 void handleRoot() {
   digitalWrite(led, 1);
@@ -35,11 +38,12 @@ void handleRoot() {
   </head>\
   <body>\
     <h1>Hello from ESP8266!</h1>\
-    <p>no of peoples is: %0.2f</p>\
+    <h2>no of peoples inside is = %0.2f<h2>\
+     <h3>no of peoples outgoing = %0.2f</h3>\
   </body>\
 </html>",
 
-           count
+           inside, outgoing
           );
   server.send(200, "text/html", temp);
   digitalWrite(led, 0);
@@ -84,9 +88,8 @@ void drawGraph() {
 }
 
 void setup(void) {
-  pinMode(led, OUTPUT);
-  pinMode(IR,INPUT);
-  digitalWrite(led, 0);
+  pinMode(IR1,INPUT);
+   pinMode(IR2,INPUT);
   Serial.begin(115200);
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
@@ -118,18 +121,22 @@ void setup(void) {
 void loop(void) {
   server.handleClient();
   MDNS.update();
- 
-  val=digitalRead(IR);
+  
+  inside=digitalRead(IR1);
+  outgoing=digitalRead(IR2);
 //Serial.println(val);
- if(val==0)
+ if(inside==0)
 {
   count=count+1;
   digitalWrite(led,HIGH);
   Serial.print("No of peoples enter in : ");
   Serial.println(count);
 }
-else
+else if(outgoing==0)
 {
+  count=count-1;
+  Serial.print("No of peoples outgoing in : ");
+  Serial.println(count);
   digitalWrite(led,LOW);
 }
 delay(1000);
